@@ -1,0 +1,3 @@
+WhiteSur-icon-theme https://github.com/vinceliuice/WhiteSur-icon-theme @ 73d8040da51a9ed74e47c7366e7e9ff437601a5c (GPL-3.0; start-here-symbolic.svg is src/places/scalable, system-search-symbolic.svg is src/status/22, battery/weather/media from src/status|actions; Logo Menu index 0 symbolic = start-here-symbolic via https://github.com/Aryan20/Logomenu)
+
+icons/cc: network-wireless-symbolic is src/devices/symbolic, bluetooth-symbolic is src/status/symbolic/bluetooth-active-symbolic, network-wireless-disabled, bluetooth-disabled, audio-volume-*, display-brightness(-low) are src/status/symbolic; all recoloured #363636 to #ffffff; control-center-symbolic.svg is hand drawn (WhiteSur has none).

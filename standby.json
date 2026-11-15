@@ -1,5 +1,59 @@
 {
   "city": "Bucharest",
   "unit": "celsius",
-  "relativeY": 0.38
+  "relativeY": 0.38,
+  "dock": [
+    {
+      "name": "Brave",
+      "command": [
+        "cmd.exe",
+        "/c",
+        "start",
+        "",
+        "brave"
+      ],
+      "icon": "icons/dock/brave-browser.svg",
+      "match": "brave"
+    },
+    {
+      "name": "Discord",
+      "command": [
+        "cmd.exe",
+        "/c",
+        "start",
+        "",
+        "discord:"
+      ],
+      "icon": "icons/dock/discord.svg",
+      "match": "discord"
+    },
+    {
+      "name": "File Explorer",
+      "command": [
+        "explorer.exe"
+      ],
+      "icon": "icons/dock/org.gnome.Nautilus.svg",
+      "match": "^(explorer|Microsoft\\.Windows\\.Explorer)$"
+    },
+    {
+      "name": "Spotify",
+      "command": [
+        "cmd.exe",
+        "/c",
+        "start",
+        "",
+        "spotify:"
+      ],
+      "icon": "icons/dock/spotify.svg",
+      "match": "spotify"
+    },
+    {
+      "name": "WezTerm",
+      "command": [
+        "C:\\Program Files\\WezTerm\\wezterm-gui.exe"
+      ],
+      "icon": "icons/dock/macos-terminal.svg",
+      "match": "wezterm"
+    }
+  ]
 }

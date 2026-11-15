@@ -1,0 +1,5 @@
+https://github.com/vinceliuice/WhiteSur-icon-theme
+73d8040da51a9ed74e47c7366e7e9ff437601a5c
+GPL-3.0. Files are copied unmodified from src/ (apps/scalable, mimes/scalable, places/scalable); terminal icon is the old rice's own macos-terminal.svg.
+org.gnome.Nautilus.svg and apps/explorer.svg = apps/scalable/file-manager.svg (links/apps/scalable/nautilus.svg target)
+user-trash.svg / user-trash-full.svg = places/scalable/user-trash{,-full}-dark.svg (install.sh renames these for the dark variant)

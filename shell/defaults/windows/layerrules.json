@@ -1,0 +1,11 @@
+{
+  "enable": true,
+  "rules": [
+    {"namespace": "elrice-standby", "blur": true, "ignoreAlpha": 0.2, "animation": "noAnim"},
+    {"namespace": "elrice-bar", "blur": true, "ignoreAlpha": 0.1},
+    {"namespace": "elrice-dock", "blur": true, "ignoreAlpha": 0.2},
+    {"namespace": "elrice-controlcenter", "blur": true, "ignoreAlpha": 0.2},
+    {"namespace": "elrice-applemenu", "blur": true, "ignoreAlpha": 0.2},
+    {"namespace": "elrice-spotlight", "blur": true, "ignoreAlpha": 0.2, "animation": "noAnim"}
+  ]
+}

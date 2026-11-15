@@ -1,0 +1,5 @@
+{
+  "binds": [
+    {"keys": "Super", "action": "global", "name": "spotlightToggle", "description": "Spotlight", "onRelease": true}
+  ]
+}
