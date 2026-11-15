@@ -2,3 +2,6 @@
 install.log
 *.bak*
 WhiteSur-gtk-theme/
+installer/target/
+.claude/
+.serena/

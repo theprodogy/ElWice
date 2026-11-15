@@ -1,87 +1,80 @@
-# ElRice - Rust soon!
+# ElRice
 
 Created by [@infectedwarelol](https://github.com/infectedwarelol).
 
 ![The ElRice desktop with the StandBy clock and widgets](screenshots/desktop.png)
 
-ElRice is a liquid glass GNOME rice for Arch Linux that borrows the look of macOS and iOS without pretending to be either. The top bar, dock, Quick Settings, menus and apps sit on white frosted glass over your wallpaper, a StandBy-style clock and a few widgets live on the bare desktop, and the login screen and terminal match the rest. It runs as its own GNOME session with its own settings, so the desktops you already have stay exactly as they are.
+ElRice is a liquid glass desktop rice for Windows 11 that borrows the look of macOS and iOS without pretending to be either. Dark smoked glass all round: a top bar sits over your wallpaper, a StandBy-style clock and a few widgets live on the bare desktop, a glass dock sits at the bottom, and the terminal matches the rest. The icons are drawn SVGs, not emoji. It runs on the Windows port of [Quickshell](https://quickshell.org), and the installer sets that up for you.
+
+The screenshots below are from the GNOME version of the rice, so details on Windows will differ.
 
 | Terminal | Quick Settings | Overview |
 | --- | --- | --- |
-| ![Ghostty on glass](screenshots/terminal.png) | ![Quick Settings](screenshots/quick-settings.png) | ![Overview](screenshots/overview.png) |
+| ![Terminal on glass](screenshots/terminal.png) | ![Quick Settings](screenshots/quick-settings.png) | ![Overview](screenshots/overview.png) |
 
 ## Install
 
-Clone the repo into the path the rice expects, then run the installer as your normal user. It asks for sudo when it needs it.
+You need Windows 11 22H2 or newer, the Rust toolchain and winget. Clone the repo, build the installer and run it from the clone.
 
-```bash
-git clone https://github.com/infectedwarelol/ElRice ~/rices/gnome-macos
-~/rices/gnome-macos/install.sh
+```powershell
+git clone https://github.com/infectedwarelol/ElRice
+cd ElRice\installer
+cargo build --release
+target\release\elrice.exe install
 ```
 
-The installer pulls in GNOME, the WhiteSur GTK, icon and cursor themes, Ghostty and the Inter font, then fetches the extensions that match your GNOME Shell version from extensions.gnome.org. At the end it asks whether to install the glass login theme for SDDM.
-
-You need Arch or a derivative with `yay`, and SDDM as your display manager. GDM is not used. It was built and tested on GNOME 51.
+The installer pulls in [nunreasonable/quickshell-windows](https://github.com/nunreasonable/quickshell-windows) (v0.3.2-win2) to `%LOCALAPPDATA%\Programs\Quickshell` if it is not there yet, then sets up the rest.
 
 ## Use
 
-Log out, pick **GNOME (macOS rice)** in SDDM and log in. Pick that session and not plain "GNOME", because the rice keeps its own dconf database and its own config folder in `~/.config-gnome-macos`.
-
-Press Super+Space to search, Super to open the overview, and Super+Shift+S to take a screenshot.
+The rice starts on its own at login. To start it by hand, run `qs -c elrice`.
 
 ## What it does
 
-- **StandBy clock.** An analog clock and weather card on the desktop, with Calendar, Now Playing and Battery widgets underneath. Now Playing follows any music player and has its own controls. Everything hides behind your windows and only shows on the bare desktop.
-- **Glass everywhere.** The top bar, dock, Quick Settings, menus, notifications, volume popups and GTK apps all sit on white translucent glass over a blur. Switches that are on turn solid white, like on iOS.
-- **Overview.** Pressing Super blurs the wallpaper, but only when you have apps open.
-- **Top bar.** Shows the name of the focused app next to the Apple logo.
-- **Windows.** Rounded corners on every window and a Magic Lamp minimise animation.
-- **Terminal.** Ghostty on smoky glass, with a fastfetch Apple logo in the rice colours.
-- **Login screen.** A glass SDDM theme with a blurred wallpaper, a big clock and a pill-shaped password field.
-- **Sounds.** A macOS-style sound theme for login, logout, screenshots and notifications.
+- **StandBy clock.** An analog clock and weather card on the desktop, behind your windows, with Calendar, Now Playing and Battery widgets underneath. Now Playing follows any app that shows up in Windows media controls.
+- **Top bar.** Dark glass bar with a small logo, the name of the focused app and the clock.
+- **Dock.** A glass dock at the bottom with the pinned apps from the `"dock"` list in `standby.json` plus your open windows.
+- **Spotlight.** A centred glass search bar that finds installed apps, does quick maths and falls back to a web search. Open it with a tap of the Windows key (Ctrl+Esc still opens the Start menu), the dock's apps button or the bar logo, then use the arrow keys, Enter to launch and Esc to close.
+- **Icons.** Weather, battery, media controls and the bar logo are line icons drawn as SVGs in `shell/icons/`.
+- **Dark mode.** Windows switches to dark mode with transparency on.
+- **Taskbar.** Auto-hidden, replaced by the dock, so the bar and the desktop stay clean.
+- **Wallpaper.** The ElRice wallpaper is set for you.
+- **Terminal.** A WezTerm config on acrylic glass, with the fastfetch Apple logo.
+- **Sounds.** macOS-style sounds.
 
 ## Make it yours
 
 | What | Where |
 | --- | --- |
 | Weather city and unit | `standby.json` |
-| Glass on the shell | `extensions/standby-glass@gnome-macos/stylesheet.css` |
-| Glass on apps | `gtk/gtk-4.0/liquidglass.css` and `gtk/gtk-3.0/liquidglass.css` |
-| Blur strength and tint | Blur my Shell preferences, pipelines "Classic Light Background" and "Overview Soft" |
-| Terminal transparency | `background-opacity` in `ghostty/config` |
+| Dock apps | `standby.json` |
+| Widgets | `shell/*.qml` |
+| Glass and blur | `shell/layerrules.json` |
+| Terminal | `~/.config/wezterm/wezterm.lua`, written by `installer/src/terminal.rs` |
 | Terminal logo | `fastfetch/config.jsonc` |
 | Wallpaper | `wallpaper/wallpaper.jpg` |
 
-GNOME on Wayland only reloads extension code in a new session, so log out and back in after you change the extension files.
-
-## Performance
-
-The top bar and dock use a static blur, which is blurred once instead of every frame. That keeps GNOME Shell light even with glass on every window. If an app still feels heavy, add its window class to the Blur my Shell applications blacklist so it renders without glass.
-
-## Spotify debloat
-
-`spotify-debloat/` patches the Spotify client with SpotX and a light Spicetify theme, then re-patches it automatically after every update. Clone ElRice, copy that folder to `~/.local/share/spotify-debloat` and run its `install.sh`. See `spotify-debloat/README.md` for details and `revert.sh` to undo it.
-
-## Rust helper
-
-`rust/spotify-debloat-check` is a small Rust binary that checks whether Spotify is already patched before the debloat script runs. That check used to start bash and Python on every Spotify launcher update; it now takes about 1 ms instead of 40 ms. Build it with `cargo build --release` inside `rust/` and copy `target/release/spotify-debloat-check` to `~/.local/bin`. The units in `systemd/` call it.
-
-The same crate also builds `spotify-lite`, a Rust version of the Spotify launcher wrapper that runs the patch check in-process before starting Spotify (about 2.6 ms instead of 38 ms per launch). Copy `target/release/spotify-lite` to `~/.local/bin` and point the Spotify desktop entry's `Exec=` at it.
+After you edit files in `shell/`, run `elrice.exe install` again or restart with `qs -c elrice`.
 
 ## Uninstall
 
-```bash
-~/rices/gnome-macos/revert.sh
+```powershell
+cd ElRice\installer
+target\release\elrice.exe revert
 ```
 
-It removes the session entry, the rice settings and config folder, the extensions it installed and the SDDM theme, then prints the packages it added so you can remove them yourself.
+This restores the registry values, wallpaper and taskbar, removes the autostart entry, the WezTerm config and `%LOCALAPPDATA%\quickshell\elrice`. Quickshell itself stays. To remove it too:
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\Quickshell\install.ps1" -Uninstall
+```
 
 ## If something looks off
 
 - **The clock says "Weather unavailable".** The weather comes from wttr.in, so check that `curl https://wttr.in` works on your network.
-- **The glass looks grey.** Make sure Blur my Shell is on and that you logged into the rice session.
-- **A change does not show up.** Log out and back in.
+- **No glass.** Blur needs the Windows 11 transparency effects switched on.
+- **Nothing shows up.** Run `qs -c elrice` in a terminal to see the QML errors.
 
 ## Credits
 
-Built on the [WhiteSur themes](https://github.com/vinceliuice) by vinceliuice, [Blur my Shell](https://github.com/aunetx/blur-my-shell), [Search Light](https://github.com/icedman/search-light), Dash to Dock, Logo Menu, OpenWeather Refined, Media Controls, Quick Settings Tweaks, Compiz alike Magic Lamp Effect, Rounded Window Corners Reborn, [Ghostty](https://ghostty.org) and [fastfetch](https://github.com/fastfetch-cli/fastfetch). Weather by [wttr.in](https://wttr.in).
+Built on [Quickshell](https://quickshell.org) and its Windows port by [nunreasonable](https://github.com/nunreasonable/quickshell-windows), and [fastfetch](https://github.com/fastfetch-cli/fastfetch). Weather by [wttr.in](https://wttr.in). Dock icons from [WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme) by vinceliuice (GPL-3.0, see `shell/icons/dock/`).
