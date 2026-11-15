@@ -8,7 +8,7 @@ for entry in "$SHARED_CONFIG"/* "$SHARED_CONFIG"/.[!.]*; do
     [ -e "$entry" ] || continue
     name="${entry##*/}"
     case "$name" in
-        gtk-3.0|gtk-4.0) continue ;;
+        gtk-3.0|gtk-4.0|fastfetch) continue ;;
     esac
     [ -e "$GNOME_CONFIG/$name" ] || [ -L "$GNOME_CONFIG/$name" ] || ln -s "$entry" "$GNOME_CONFIG/$name"
 done
@@ -18,6 +18,9 @@ for gtk_dir in gtk-3.0 gtk-4.0; do
     [ -e "$SHARED_CONFIG/$gtk_dir/bookmarks" ] && [ ! -e "$GNOME_CONFIG/$gtk_dir/bookmarks" ] && \
         ln -s "$SHARED_CONFIG/$gtk_dir/bookmarks" "$GNOME_CONFIG/$gtk_dir/bookmarks"
 done
+[ -L "$GNOME_CONFIG/fastfetch" ] && rm "$GNOME_CONFIG/fastfetch"
+mkdir -p "$GNOME_CONFIG/fastfetch"
+ln -sfn "$RICE/fastfetch/config.jsonc" "$GNOME_CONFIG/fastfetch/config.jsonc"
 
 export XDG_CONFIG_HOME="$GNOME_CONFIG"
 export DCONF_PROFILE="$RICE/dconf/profile"
