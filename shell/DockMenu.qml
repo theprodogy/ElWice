@@ -17,6 +17,7 @@ MenuDropdown {
     readonly property bool isPath: !isAumid && /[\\/]/.test(appId)
     readonly property string exe: appId.replace(/^.*[!\\/]/, "").replace(/\.exe$/i, "")
     readonly property bool hasWindows: windows.length > 0
+    readonly property string prettyName: exe.charAt(0).toUpperCase() + exe.slice(1)
 
     namespace: "elrice-dockmenu"
     atBottom: true
@@ -32,6 +33,8 @@ MenuDropdown {
             Quickshell.execDetached(["explorer.exe", "shell:AppsFolder\\" + appId])
         else if (isPath)
             Quickshell.execDetached([appId])
+        else if (exe !== "")
+            Quickshell.execDetached(["cmd.exe", "/c", "start", "", exe])
     }
 
     function pin() {
@@ -39,7 +42,7 @@ MenuDropdown {
             : isPath ? [appId] : ["cmd.exe", "/c", "start", "", exe]
         const key = isAumid ? appId : exe
         pinsEdited(currentPins.concat([{
-            name: isAumid ? appName : exe.charAt(0).toUpperCase() + exe.slice(1),
+            name: isAumid ? appName : prettyName,
             icon: String(icons.iconFor(appId)),
             command: command,
             match: key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
@@ -63,8 +66,8 @@ MenuDropdown {
 
     rows: {
         const list = [
-            {name: appName, disabled: true},
-            {name: "New Window", disabled: !entry && !isAumid && !isPath, run: newWindow},
+            {name: entry || isAumid || exe === "" ? appName : prettyName, disabled: true},
+            {name: "New Window", disabled: !entry && !isAumid && exe === "", run: newWindow},
             entry ? {name: "Unpin from Dock", run: unpin} : {name: "Pin to Dock", run: pin}
         ]
         if (isPath)
