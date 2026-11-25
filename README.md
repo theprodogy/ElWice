@@ -1,4 +1,6 @@
-# ElRice
+# ElWice
+
+![The ElWice desktop with the StandBy widgets, top bar and dock](screenshots/desktop.png)
 
 A liquid glass desktop for Windows 11 that swaps the taskbar for a macOS-style dock, top bar and StandBy widgets.
 
@@ -6,8 +8,6 @@ A liquid glass desktop for Windows 11 that swaps the taskbar for a macOS-style d
 ![Quickshell](https://img.shields.io/badge/Quickshell-0.3.2--win2-555)
 ![QML](https://img.shields.io/badge/QML-shell-41CD52?logo=qt&logoColor=white)
 ![Rust](https://img.shields.io/badge/Rust-installer-CE422B?logo=rust&logoColor=white)
-
-![The ElRice desktop with the StandBy widgets, top bar and dock](screenshots/desktop.png)
 
 ## Contents
 
@@ -24,9 +24,9 @@ A liquid glass desktop for Windows 11 that swaps the taskbar for a macOS-style d
 
 ## About
 
-ElRice borrows the look of macOS and iOS without pretending to be either. Everything is dark smoked glass. A top bar sits over your wallpaper, StandBy-style widgets live on the bare desktop, and a glass dock fully replaces the Windows taskbar. The terminal matches the rest. The icons are drawn SVGs, not emoji.
+ElWice borrows the look of macOS and iOS without pretending to be either. Everything is dark smoked glass. A top bar sits over your wallpaper, StandBy-style widgets live on the bare desktop, and a glass dock fully replaces the Windows taskbar. The terminal matches the rest. The icons are drawn SVGs, not emoji.
 
-ElRice started as [@infectedwarelol](https://github.com/infectedwarelol)'s Arch Linux / GNOME rice. This fork ports it to Windows. The shell runs on the [Windows port of Quickshell](https://github.com/nunreasonable/quickshell-windows), so the whole UI is plain QML you can edit live. A small Rust installer sets everything up and can undo all of it again.
+ElWice is the Windows port of [ElRice](https://github.com/infectedwarelol/ElRice), [@infectedwarelol](https://github.com/infectedwarelol)'s Arch Linux / GNOME rice, hence the name. The shell runs on the [Windows port of Quickshell](https://github.com/nunreasonable/quickshell-windows), so the whole UI is plain QML you can edit live. A small Rust installer sets everything up and can undo all of it again.
 
 | Dock menu | Spotlight | Control Center |
 | --- | --- | --- |
@@ -45,7 +45,7 @@ ElRice started as [@infectedwarelol](https://github.com/infectedwarelol)'s Arch 
 - **Spotlight.** Tap the Windows key to search apps, do quick maths or fall back to a web search. Ctrl+Esc still opens the Start menu.
 - **Alt+Tab.** A glass app switcher.
 - **StandBy widgets.** Calendar, Now Playing, weather and an analog clock sit on the desktop behind your windows. Now Playing follows any app that shows up in Windows media controls.
-- **The rest of the look.** Dark mode with transparency, the ElRice wallpaper, a WezTerm config on acrylic glass with the fastfetch Apple logo, and macOS-style sounds.
+- **The rest of the look.** Dark mode with transparency, the ElWice wallpaper, a WezTerm config on acrylic glass with the fastfetch Apple logo, and macOS-style sounds.
 
 ## Install
 
@@ -70,7 +70,7 @@ The installer does the following:
 
 ## Usage
 
-ElRice starts on its own at login. To start it by hand, run `qs -c elrice`.
+ElWice starts on its own at login. To start it by hand, run `qs -c elrice`.
 
 | Action | How |
 | --- | --- |
