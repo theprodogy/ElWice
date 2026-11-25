@@ -6,6 +6,7 @@ mod quickshell;
 mod shell_config;
 mod sounds;
 mod terminal;
+mod timeserver;
 mod wallpaper;
 
 use std::env;
@@ -41,7 +42,7 @@ fn find_root() -> Res<PathBuf> {
         .ok_or_else(|| "repo root not found (need shell/shell.qml and wallpaper/ above the current dir or the exe)".into())
 }
 
-fn install() -> Res<()> {
+fn install(live: bool) -> Res<()> {
     let root = find_root()?;
     println!("repo: {}", root.display());
     quickshell::ensure()?;
@@ -56,7 +57,7 @@ fn install() -> Res<()> {
         backup::write(&entries)?;
         println!("backup written");
     }
-    shell_config::apply(&root)?;
+    shell_config::apply(&root, live)?;
     wallpaper::apply(&root)?;
     appearance::apply()?;
     sounds::apply(&root)?;
@@ -84,8 +85,10 @@ fn clean_state() -> Res<()> {
 
 fn revert() -> Res<()> {
     autostart::stop();
+    appearance::show_taskbar();
     autostart::remove();
     terminal::remove();
+    timeserver::reset();
     shell_config::remove();
     let mut failed = false;
     if backup::exists()? {
@@ -115,10 +118,10 @@ fn revert() -> Res<()> {
 
 fn main() -> ExitCode {
     let result = match env::args().nth(1).as_deref() {
-        Some("install") => install(),
+        Some("install") => install(env::args().nth(2).as_deref() == Some("--live")),
         Some("revert") => revert(),
         _ => {
-            eprintln!("usage: elrice <install|revert>");
+            eprintln!("usage: elrice <install [--live]|revert>");
             return ExitCode::from(2);
         }
     };

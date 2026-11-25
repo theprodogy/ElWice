@@ -2,10 +2,11 @@ use crate::Res;
 use crate::backup::{Entry, reg, set_dword};
 use crate::wallpaper::wide;
 use std::mem::{size_of, zeroed};
-use std::ptr::null;
+use std::ptr::{null, null_mut};
 use windows_sys::Win32::UI::Shell::{ABM_GETSTATE, ABM_SETSTATE, ABS_AUTOHIDE, APPBARDATA, SHAppBarMessage};
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    FindWindowW, HWND_BROADCAST, SMTO_ABORTIFHUNG, SendMessageTimeoutW, WM_SETTINGCHANGE,
+    FindWindowExW, FindWindowW, HWND_BROADCAST, SMTO_ABORTIFHUNG, SW_SHOW, SendMessageTimeoutW, ShowWindow,
+    WM_SETTINGCHANGE,
 };
 
 const KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
@@ -29,6 +30,20 @@ pub fn set_autohide(on: bool) -> Res<()> {
     d.lParam = ((state() & !flag) | if on { flag } else { 0 }) as isize;
     unsafe { SHAppBarMessage(ABM_SETSTATE, &mut d) };
     Ok(())
+}
+
+pub fn show_taskbar() {
+    for class in ["Shell_TrayWnd", "Shell_SecondaryTrayWnd"] {
+        let class = wide(class);
+        let mut h = null_mut();
+        loop {
+            h = unsafe { FindWindowExW(null_mut(), h, class.as_ptr(), null()) };
+            if h.is_null() {
+                break;
+            }
+            unsafe { ShowWindow(h, SW_SHOW) };
+        }
+    }
 }
 
 pub fn snapshot() -> Res<Vec<Entry>> {

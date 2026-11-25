@@ -5,3 +5,6 @@ WhiteSur-gtk-theme/
 installer/target/
 .claude/
 .serena/
+shell/*.exe
+shell/standby.json
+shell/wallpaper.jpg
