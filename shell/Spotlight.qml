@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Windows
@@ -12,6 +11,8 @@ PanelWindow {
     property int current: 0
     property int filter: 0
     property string pending: ""
+
+    signal dismissed
     readonly property real cardWidth: 600 + screen.width / 2 * 0.36
     readonly property var results: collect(query, filter)
     readonly property var rows: sections(results)
@@ -221,6 +222,7 @@ PanelWindow {
     }
 
     visible: false
+    onVisibleChanged: if (!visible) dismissed()
     color: "transparent"
     exclusiveZone: 0
     anchors {
@@ -233,17 +235,6 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "elrice-spotlight"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-
-    GlobalShortcut {
-        name: "spotlightToggle"
-        description: "Toggle Spotlight"
-        onPressed: spotlight.toggle()
-    }
-
-    IpcHandler {
-        target: "spotlight"
-        function toggle(): void { spotlight.toggle() }
-    }
 
     MouseArea {
         anchors.fill: parent

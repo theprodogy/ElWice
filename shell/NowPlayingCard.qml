@@ -4,6 +4,8 @@ import Quickshell.Services.Mpris
 GlassCard {
     id: card
 
+    settingsKey: "nowplaying"
+
     readonly property MprisPlayer player: Mpris.players.values.find(p => p.isPlaying) ?? Mpris.players.values[0] ?? null
 
     width: 364

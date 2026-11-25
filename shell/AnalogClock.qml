@@ -4,13 +4,18 @@ import Quickshell
 GlassCard {
     id: card
 
+    readonly property bool showSeconds: config?.widgets?.clock?.showSeconds !== false
+
+    settingsKey: "clock"
+    onShowSecondsChanged: face.requestPaint()
+
     width: 170
     height: 170
     radius: 22
 
     SystemClock {
         id: clock
-        precision: SystemClock.Seconds
+        precision: card.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
         onDateChanged: face.requestPaint()
     }
 
@@ -72,9 +77,11 @@ GlassCard {
             hand(ctx, hours * Math.PI / 6, radius * 0.5, 0, 5.5, "#ffffff")
             hand(ctx, minutes * Math.PI / 30, radius * 0.78, 0, 3.8, "#ffffff")
             dot(ctx, 5.5, "#ffffff")
-            hand(ctx, seconds * Math.PI / 30, radius * 0.88, radius * 0.16, 1.8, "#ff9f0a")
-            dot(ctx, 3.2, "#ff9f0a")
-            dot(ctx, 1.2, "#000000")
+            if (showSeconds) {
+                hand(ctx, seconds * Math.PI / 30, radius * 0.88, radius * 0.16, 1.8, "#ff9f0a")
+                dot(ctx, 3.2, "#ff9f0a")
+                dot(ctx, 1.2, "#000000")
+            }
         }
     }
 }

@@ -3,21 +3,29 @@ import QtQuick
 GlassCard {
     id: card
 
-    property var config
+    settingsKey: "weather"
+
     property string temperature: "--°"
     property string condition: "Loading…"
     property string range: "H:--° L:--°"
     property string icon: "weather-few-clouds"
 
+    property string place
+    property real latitude
+    property real longitude
+
     readonly property var icons: [
-        {codes: [113], day: "weather-clear", night: "weather-clear-night"},
-        {codes: [116], day: "weather-few-clouds", night: "weather-few-clouds-night"},
-        {codes: [119, 122], day: "weather-overcast", night: "weather-overcast"},
-        {codes: [143, 248, 260], day: "weather-fog", night: "weather-fog"},
-        {codes: [176, 263, 266, 281, 284, 293, 296, 353], day: "weather-showers-scattered", night: "weather-showers-scattered"},
-        {codes: [299, 302, 305, 308, 311, 314, 356, 359], day: "weather-showers", night: "weather-showers"},
-        {codes: [179, 182, 185, 227, 230, 317, 320, 323, 326, 329, 332, 335, 338, 350, 362, 365, 368, 371, 374, 377], day: "weather-snow", night: "weather-snow"},
-        {codes: [200, 386, 389, 392, 395], day: "weather-storm", night: "weather-storm"}
+        {codes: [0], text: "Clear", day: "weather-clear", night: "weather-clear-night"},
+        {codes: [1], text: "Mainly Clear", day: "weather-clear", night: "weather-clear-night"},
+        {codes: [2], text: "Partly Cloudy", day: "weather-few-clouds", night: "weather-few-clouds-night"},
+        {codes: [3], text: "Overcast", day: "weather-overcast", night: "weather-overcast"},
+        {codes: [45, 48], text: "Fog", day: "weather-fog", night: "weather-fog"},
+        {codes: [51, 53, 55, 56, 57], text: "Drizzle", day: "weather-showers-scattered", night: "weather-showers-scattered"},
+        {codes: [61, 63, 65, 66, 67], text: "Rain", day: "weather-showers", night: "weather-showers"},
+        {codes: [71, 73, 75, 77], text: "Snow", day: "weather-snow", night: "weather-snow"},
+        {codes: [80, 81, 82], text: "Showers", day: "weather-showers", night: "weather-showers"},
+        {codes: [85, 86], text: "Snow Showers", day: "weather-snow", night: "weather-snow"},
+        {codes: [95, 96, 99], text: "Thunderstorm", day: "weather-storm", night: "weather-storm"}
     ]
 
     width: 364
@@ -28,9 +36,7 @@ GlassCard {
         return Math.round(Number(value)) + "°"
     }
 
-    function refresh() {
-        var city = config?.city ?? "Bucharest"
-        var fahrenheit = config?.unit === "fahrenheit"
+    function get(url, done) {
         var request = new XMLHttpRequest()
         request.onreadystatechange = function() {
             if (request.readyState !== XMLHttpRequest.DONE)
@@ -38,24 +44,49 @@ GlassCard {
             try {
                 if (request.status !== 200)
                     throw new Error("HTTP " + request.status)
-                var data = JSON.parse(request.responseText)
-                var current = data.current_condition[0]
-                var today = data.weather[0]
-                var code = Number(current.weatherCode)
-                var entry = icons.find(function(candidate) { return candidate.codes.indexOf(code) >= 0 })
-                var hour = new Date().getHours()
-                var isDay = hour >= 6 && hour < 20
-                card.icon = !entry ? "weather-severe-alert" : isDay ? entry.day : entry.night
-                card.condition = current.weatherDesc[0].value
-                card.temperature = degrees(fahrenheit ? current.temp_F : current.temp_C)
-                card.range = "H:" + degrees(fahrenheit ? today.maxtempF : today.maxtempC)
-                    + " L:" + degrees(fahrenheit ? today.mintempF : today.mintempC)
+                done(JSON.parse(request.responseText))
             } catch (error) {
                 card.condition = "Weather unavailable"
             }
         }
-        request.open("GET", "https://wttr.in/" + encodeURIComponent(city) + "?format=j1")
+        request.open("GET", url)
         request.send()
+    }
+
+    function forecast() {
+        var url = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude
+            + "&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1"
+            + (config?.unit === "fahrenheit" ? "&temperature_unit=fahrenheit" : "")
+        get(url, function(data) {
+            var code = data.current.weather_code
+            var entry = icons.find(function(candidate) { return candidate.codes.indexOf(code) >= 0 })
+            card.icon = !entry ? "weather-severe-alert" : data.current.is_day ? entry.day : entry.night
+            card.condition = entry ? entry.text : "Unknown"
+            card.temperature = degrees(data.current.temperature_2m)
+            card.range = "H:" + degrees(data.daily.temperature_2m_max[0]) + " L:" + degrees(data.daily.temperature_2m_min[0])
+        })
+    }
+
+    function refresh() {
+        var city = String(config?.city ?? "Bucharest")
+        if (city === place) {
+            forecast()
+            return
+        }
+        var pair = city.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/)
+        if (pair) {
+            place = city
+            latitude = Number(pair[1])
+            longitude = Number(pair[2])
+            forecast()
+            return
+        }
+        get("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(city) + "&count=1&language=en&format=json", function(data) {
+            place = city
+            latitude = data.results[0].latitude
+            longitude = data.results[0].longitude
+            forecast()
+        })
     }
 
     onConfigChanged: refresh()

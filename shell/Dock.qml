@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Windows
-import Quickshell.Hyprland
 import Quickshell.Wayland
 
 PanelWindow {
@@ -9,29 +8,17 @@ PanelWindow {
 
     property var config: ({dock: []})
     property var pinned: config.dock ?? []
-    property bool shown: hover.hovered
+    property bool menuOpen: menuLazy.active
+    property bool shown: hover.hovered || menuOpen || tray.open
     property real reveal: 1
+
+    signal pinsChanged(var list)
+
+    AppIcons { id: icons }
 
     function matches(entry, toplevel) {
         const re = new RegExp(entry.match, "i")
         return re.test(toplevel.appId) || re.test(toplevel.title)
-    }
-
-    readonly property var appIcons: [
-        [/brave.*beta/, "brave-beta"], [/brave.*(nightly|dev)/, "brave-nightly"], [/brave/, "brave"],
-        [/helium/, "helium"], [/chromium/, "chromium"], [/chrome/, "chrome"], [/edge/, "msedge"],
-        [/firefox/, "firefox"], [/^(code|vscode|visual ?studio ?code)/, "code"], [/steam/, "steam"],
-        [/obsidian/, "obsidian"], [/telegram/, "telegram"], [/notepad|texteditor/, "notepad"],
-        [/systemsettings|immersivecontrolpanel/, "settings"], [/taskmgr|taskmanager/, "taskmgr"],
-        [/calc/, "calculator"], [/prism/, "prismlauncher"], [/minecraft/, "minecraft"],
-        [/^obs/, "obs"], [/^vlc/, "vlc"], [/gimp/, "gimp"], [/discord/, "discord"],
-        [/spotify/, "spotify"], [/explorer/, "explorer"], [/wezterm/, "wezterm"]
-    ]
-
-    function iconFor(appId) {
-        const id = String(appId).toLowerCase().replace(/^.*[!\\/]/, "").replace(/\.exe$/, "")
-        const hit = appIcons.find(e => e[0].test(id) || e[0].test(String(appId).toLowerCase()))
-        return hit ? Qt.resolvedUrl("icons/dock/apps/" + hit[1] + ".svg") : "image://icon/" + appId
     }
 
     function windowsFor(entry) {
@@ -44,6 +31,17 @@ PanelWindow {
 
     function hasExtras() {
         return ToplevelManager.toplevels.values.some(t => !isPinned(t))
+    }
+
+    function showMenu(item, name, windows, entry, appId) {
+        menuLazy.active = true
+        const menu = menuLazy.item
+        menu.appName = name
+        menu.windows = windows
+        menu.entry = entry
+        menu.appId = appId
+        menu.centerX = (screen.width - width) / 2 + item.mapToItem(null, item.width / 2, 0).x
+        menu.open = true
     }
 
     function toggle(toplevel) {
@@ -94,6 +92,17 @@ PanelWindow {
 
     HoverHandler { id: hover }
 
+    LazyLoader {
+        id: menuLazy
+
+        DockMenu {
+            screen: dock.screen
+            currentPins: dock.pinned
+            onPinsEdited: list => dock.pinsChanged(list)
+            onDismissed: Qt.callLater(() => menuLazy.active = false)
+        }
+    }
+
     GlassCard {
         id: pill
         anchors.horizontalCenter: parent.horizontalCenter
@@ -123,6 +132,7 @@ PanelWindow {
                         if (windows.length > 0) dock.toggle(windows.find(t => t.activated) ?? windows[0])
                         else Quickshell.execDetached(modelData.command)
                     }
+                    onRightClicked: dock.showMenu(favorite, modelData.name, windows, modelData, windows.length > 0 ? windows[0].appId : "")
                     onScrolled: direction => dock.cycle(windows, direction)
                 }
             }
@@ -131,6 +141,7 @@ PanelWindow {
                 model: ToplevelManager.toplevels
 
                 DockItem {
+                    id: extra
                     required property var modelData
                     property bool entered: false
                     visible: !dock.isPinned(modelData)
@@ -140,12 +151,13 @@ PanelWindow {
                     Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.Bezier; easing.bezierCurve: [0.23, 1, 0.32, 1, 1, 1] } }
                     Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.Bezier; easing.bezierCurve: [0.23, 1, 0.32, 1, 1, 1] } }
                     Component.onCompleted: entered = true
-                    iconSource: dock.iconFor(modelData.appId)
+                    iconSource: icons.iconFor(modelData.appId)
                     fallbackSource: Qt.resolvedUrl("icons/dock/application-x-executable.svg")
                     label: modelData.title
                     running: true
                     focused: modelData.activated
                     onClicked: dock.toggle(modelData)
+                    onRightClicked: dock.showMenu(extra, modelData.title, [modelData], null, modelData.appId)
                 }
             }
 
@@ -161,16 +173,15 @@ PanelWindow {
                 }
             }
 
+            TrayButton {
+                id: tray
+                screen: dock.screen
+            }
+
             DockItem {
                 iconSource: Qt.resolvedUrl("icons/dock/user-trash.svg")
                 label: "Recycle Bin"
                 onClicked: Quickshell.execDetached(["explorer.exe", "shell:RecycleBinFolder"])
-            }
-
-            DockItem {
-                iconSource: Qt.resolvedUrl("icons/dock/view-app-grid.svg")
-                label: "Apps"
-                onClicked: Hyprland.dispatch("global quickshell:spotlightToggle")
             }
         }
     }

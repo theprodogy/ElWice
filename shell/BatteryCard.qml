@@ -4,6 +4,8 @@ import Quickshell.Services.UPower
 GlassCard {
     id: card
 
+    settingsKey: "battery"
+
     readonly property var device: UPower.displayDevice
     readonly property real level: device.percentage
     readonly property bool charging: device.state === UPowerDeviceState.Charging

@@ -6,6 +6,11 @@
     {"namespace": "elrice-dock", "blur": true, "ignoreAlpha": 0.2},
     {"namespace": "elrice-controlcenter", "blur": true, "ignoreAlpha": 0.2},
     {"namespace": "elrice-applemenu", "blur": true, "ignoreAlpha": 0.2},
-    {"namespace": "elrice-spotlight", "blur": true, "ignoreAlpha": 0.2, "animation": "noAnim"}
+    {"namespace": "elrice-widgetsettings", "blur": true, "ignoreAlpha": 0.2},
+    {"namespace": "elrice-appmenu", "blur": true, "ignoreAlpha": 0.2},
+    {"namespace": "elrice-dockmenu", "blur": true, "ignoreAlpha": 0.2},
+    {"namespace": "elrice-tray", "blur": true, "ignoreAlpha": 0.2},
+    {"namespace": "elrice-spotlight", "blur": true, "ignoreAlpha": 0.2, "animation": "noAnim"},
+    {"namespace": "elrice-alttab", "blur": true, "ignoreAlpha": 0.2, "animation": "noAnim"}
   ]
 }

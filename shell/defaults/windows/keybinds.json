@@ -1,5 +1,7 @@
 {
   "binds": [
-    {"keys": "Super", "action": "global", "name": "spotlightToggle", "description": "Spotlight", "onRelease": true}
+    {"keys": "Super", "action": "global", "name": "spotlightToggle", "description": "Spotlight", "onRelease": true},
+    {"keys": "Alt+Tab", "action": "global", "name": "altTab", "description": "Next app"},
+    {"keys": "Alt+Shift+Tab", "action": "global", "name": "altShiftTab", "description": "Previous app"}
   ]
 }

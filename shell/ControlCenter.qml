@@ -18,6 +18,8 @@ PanelWindow {
     readonly property var adapter: Bluetooth.defaultAdapter
     readonly property MprisPlayer player: Mpris.players.values.find(p => p.isPlaying) ?? Mpris.players.values[0] ?? null
 
+    signal dismissed
+
     function toggle() {
         open = !open
         if (open)
@@ -25,6 +27,7 @@ PanelWindow {
     }
 
     visible: open || card.opacity > 0
+    onVisibleChanged: if (!visible) dismissed()
     color: "transparent"
 
     anchors {
@@ -178,6 +181,7 @@ PanelWindow {
                     Image {
                         anchors.fill: parent
                         source: cc.player?.trackArtUrl ?? ""
+                        sourceSize: Qt.size(120, 120)
                         fillMode: Image.PreserveAspectCrop
                     }
                 }

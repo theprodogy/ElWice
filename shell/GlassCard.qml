@@ -8,6 +8,13 @@ Item {
     property real radius: 26
     property color tint: Qt.rgba(0.06, 0.06, 0.08, 0.4)
     property bool shadow: false
+    property var config
+    property string settingsKey
+    readonly property bool hidden: config?.widgets?.[settingsKey]?.hidden === true
+
+    signal settingsRequested(rect target)
+
+    opacity: hidden ? 0 : 1
 
     Rectangle {
         anchors.fill: parent
@@ -66,5 +73,12 @@ Item {
     Item {
         id: inner
         anchors.fill: parent
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        enabled: card.settingsKey !== ""
+        acceptedButtons: Qt.RightButton
+        onClicked: card.settingsRequested(card.mapToItem(null, 0, 0, card.width, card.height))
     }
 }

@@ -10,21 +10,30 @@ PanelWindow {
     signal controlCenterToggled
     signal appleMenuToggled
 
-    readonly property var toplevel: ToplevelManager.activeToplevel
+    signal appMenuClicked(int index)
+
+    property int openMenu: -1
+    property var frozen: null
+
+    readonly property var toplevel: frozen ?? ToplevelManager.activeToplevel
     readonly property var device: UPower.displayDevice
-    readonly property var names: ({
-        "code": "Visual Studio Code", "wezterm-gui": "WezTerm", "brave": "Brave", "chrome": "Chrome",
-        "msedge": "Edge", "firefox": "Firefox", "explorer": "File Explorer", "windowsterminal": "Terminal",
-        "spotify": "Spotify", "discord": "Discord", "cursor": "Cursor", "notepad": "Notepad"
-    })
-    readonly property string appName: {
-        if (!toplevel)
-            return "Finder"
-        const id = (toplevel.appId ?? "").split(/[\\/]/).pop().toLowerCase().replace(/\.exe$/, "")
-        if (names[id])
-            return names[id]
-        return id !== "" ? id.charAt(0).toUpperCase() + id.slice(1) : (toplevel.title || "Finder")
+    readonly property var info: appMenus.resolve(toplevel)
+    readonly property string appName: info.name
+    readonly property var menus: info.menus
+
+    onOpenMenuChanged: frozen = openMenu >= 0 ? (frozen ?? ToplevelManager.activeToplevel) : null
+
+    function titleRects() {
+        const rects = []
+        for (let n = 0; n < titles.count; n++) {
+            const item = titles.itemAt(n)
+            rects.push({x: item.mapToItem(null, 0, 0).x, w: item.width})
+        }
+        return rects
     }
+
+    AppMenus { id: appMenus }
+
     property bool light: false
     readonly property color fg: light ? "#000000" : "#ffffff"
 
@@ -103,15 +112,19 @@ PanelWindow {
         }
 
         Repeater {
-            model: ["File", "Edit", "View", "Window", "Help"]
+            id: titles
+            model: bar.menus
 
             BarItem {
-                required property string modelData
+                required property var modelData
+                required property int index
 
                 tint: bar.fg
+                active: bar.openMenu === index
+                onClicked: bar.appMenuClicked(index)
 
                 BarText {
-                    text: modelData
+                    text: modelData.title
                     color: bar.fg
                     font.pixelSize: 13
                 }

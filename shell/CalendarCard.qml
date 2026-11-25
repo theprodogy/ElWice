@@ -4,8 +4,11 @@ import Quickshell
 GlassCard {
     id: card
 
+    settingsKey: "calendar"
+
     readonly property date today: clock.date
-    readonly property int offset: (new Date(today.getFullYear(), today.getMonth(), 1).getDay() + 6) % 7
+    readonly property bool sundayFirst: config?.widgets?.calendar?.weekStart === "sunday"
+    readonly property int offset: (new Date(today.getFullYear(), today.getMonth(), 1).getDay() + (sundayFirst ? 0 : 6)) % 7
     readonly property int days: new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
 
     width: 364
@@ -48,7 +51,7 @@ GlassCard {
         columns: 7
 
         Repeater {
-            model: ["M", "T", "W", "T", "F", "S", "S"]
+            model: card.sundayFirst ? ["S", "M", "T", "W", "T", "F", "S"] : ["M", "T", "W", "T", "F", "S", "S"]
 
             UiText {
                 required property string modelData

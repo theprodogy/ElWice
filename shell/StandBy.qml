@@ -7,6 +7,12 @@ PanelWindow {
 
     property var config
 
+    signal settingsRequested(string key, rect target)
+
+    function request(key, target) {
+        settingsRequested(key, Qt.rect(target.x + margins.left, target.y + margins.top, target.width, target.height))
+    }
+
     WlrLayershell.layer: WlrLayer.Background
     WlrLayershell.namespace: "elrice-standby"
 
@@ -32,23 +38,36 @@ PanelWindow {
         Column {
             spacing: 24
 
-            CalendarCard {}
+            CalendarCard {
+                config: window.config
+                onSettingsRequested: target => window.request(settingsKey, target)
+            }
 
             WeatherCard {
                 config: window.config
+                onSettingsRequested: target => window.request(settingsKey, target)
             }
         }
 
         Column {
             spacing: 24
 
-            NowPlayingCard {}
+            NowPlayingCard {
+                config: window.config
+                onSettingsRequested: target => window.request(settingsKey, target)
+            }
 
             Row {
                 spacing: 24
 
-                AnalogClock {}
-                BatteryCard {}
+                AnalogClock {
+                    config: window.config
+                    onSettingsRequested: target => window.request(settingsKey, target)
+                }
+                BatteryCard {
+                    config: window.config
+                    onSettingsRequested: target => window.request(settingsKey, target)
+                }
             }
         }
     }

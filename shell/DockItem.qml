@@ -10,6 +10,7 @@ Item {
     property bool focused: false
 
     signal clicked()
+    signal rightClicked()
     signal scrolled(int direction)
 
     width: 64
@@ -55,9 +56,10 @@ Item {
     MouseArea {
         id: area
         anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: item.clicked()
+        onClicked: mouse => mouse.button === Qt.RightButton ? item.rightClicked() : item.clicked()
         onWheel: wheel => item.scrolled(wheel.angleDelta.y > 0 ? -1 : 1)
     }
 }
